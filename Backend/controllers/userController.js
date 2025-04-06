@@ -23,35 +23,42 @@ const authUser = asyncHandler(async (req, res) => {
 
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, number, image } = req.body;
-    const userExist = await User.findOne({ email });
-
-    if (userExist) {
-        res.status(400);
-        throw new Error('User already exists');
-    }
-
-    const user = await User.create({
-        name,
-        email,
-        password,
-        number,
-        image
-    });
-
-    if (user) {
-        generateToken(res, user._id);
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            number: user.number,
-            image: user.image
+    try {
+        console.log(req.body)
+        const { name, email, password, number, image } = req.body;
+        const userExist = await User.findOne({ email });
+        console.log({ name, email, password, number, image })
+        if (userExist) {
+            res.status(400);
+            throw new Error('User already exists');
+        }
+    
+        const user = await User.create({
+            name,
+            email,
+            password,
+            number,
+            image
         });
-    } else {
-        res.status(400);
-        throw new Error('Invalid user data');
+    
+        if (user) {
+            generateToken(res, user._id);
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                number: user.number,
+                image: user.image
+            });
+        } else {
+            res.status(400);
+            throw new Error('Invalid user data');
+        }
+        
+    } catch (error) {
+        throw error
     }
+ 
 });
 
 
